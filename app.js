@@ -57,6 +57,7 @@ module.exports.handler = async (event, context, callback) => {
     const handler = await awsLambdaReceiver.start();
     return handler(event, context, callback);
 }
+//RELEASE TEST
 
 /* app.command("/test", async ({ command, ack, say }) => {
     try {
