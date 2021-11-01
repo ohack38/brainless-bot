@@ -1,4 +1,4 @@
-
+const {getChangedFilesForRoots} = require('jest-changed-files');
 class Stack{
     constructor(){
         this.top = -1;
@@ -19,7 +19,9 @@ class Stack{
 
 
 describe('My Stack',()=> {
-
+    getChangedFilesForRoots(['../'], {
+        lastCommit: true,
+      }).then(result => console.log(result.changedFiles));
     let stack;
     beforeEach(()=>{
         stack = new Stack;
@@ -52,4 +54,6 @@ describe('My Stack',()=> {
 
 
 
-})
+});
+
+// print the set of modified files since last commit in the current repo
