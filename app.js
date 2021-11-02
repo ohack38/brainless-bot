@@ -67,4 +67,4 @@ module.exports.testSub = async (event, context, callback) => {
       };
 }
 //RELEASE TEST
-//https://hooks.slack.com/services/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
+//https://hooks.slack.com/services/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
