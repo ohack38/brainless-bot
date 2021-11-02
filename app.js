@@ -1,13 +1,13 @@
 const { App, AwsLambdaReceiver } = require("@slack/bolt");
-require("dotenv").config();
+
 // Initializes your app with your bot token and signing secret
 const awsLambdaReceiver = new AwsLambdaReceiver({
     signingSecret: process.env.SLACK_SIGNING_SECRET,
 });
 
 const app = new App({
-  token: process.env.SLACK_BOT_TOKEN,
   receiver: awsLambdaReceiver,
+  token: process.env.SLACK_BOT_TOKEN,
   processBeforeResponse: true,
   //socketMode:true,
   appToken: process.env.APP_TOKEN
@@ -46,32 +46,25 @@ app.action('button_click', async ({ body, ack, say }) => {
   // Acknowledge the action after say() to exit the Lambda process
   await ack();
 });
-  
-// Listens to incoming messages that contain "goodbye"
-app.message('goodbye', async ({ message, say }) => {
-    await say(`See ya later, <@${message.user}> :wave:`);
-});
+ 
   
   // Handle the Lambda function event
 module.exports.handler = async (event, context, callback) => {
     const handler = await awsLambdaReceiver.start();
     return handler(event, context, callback);
 }
+
+module.exports.testSub = async (event, context, callback) => {
+    console.log('consuming testSub');
+    console.log('event received:', JSON.stringify(event));
+    console.log('context received:', context);
+    return {
+        statusCode: 200,
+        body: JSON.stringify(
+          {
+            input: event,
+          }, null, 2),
+      };
+}
 //RELEASE TEST
-
-/* app.command("/test", async ({ command, ack, say }) => {
-    try {
-      await ack();
-      say("Yaaay! that command works!");
-    } catch (error) {
-        console.log("err")
-      console.error(error);
-    }
-});
-
-(async () => {
-    const port = 3000
-    // Start your app
-    await app.start(process.env.PORT || port);
-    console.log(`⚡️ Slack Bolt app is running on port ${port}!`);
-  })(); */
+//https://hooks.slack.com/services/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

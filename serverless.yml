@@ -1,11 +1,13 @@
-service: serverless-bolt-js
+service: brainless-bot
 frameworkVersion: '2'
 provider:
   name: aws
-  runtime: nodejs14.x
+  runtime: nodejs12.x
+  region: "eu-central-1"
   environment:
     SLACK_SIGNING_SECRET: ${env:SLACK_SIGNING_TOKEN}
     SLACK_BOT_TOKEN: ${env:SLACK_BOT_TOKEN}
+    
 functions:
   slack:
     handler: app.handler
@@ -13,6 +15,19 @@ functions:
       - http:
           path: slack/events
           method: post
+  testSub:
+    handler: app.testSub
+    events:
+      - sns:
+        arn: !Ref BrainlessTopicResource
+        topicName: BrainlessTopic
+
+resources:
+  Resources:
+    BrainlessTopicResource:
+      Type: AWS::SNS::Topic
+      Properties:
+        TopicName: BrainlessTopic
 plugins:
   - serverless-offline
 
