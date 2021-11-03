@@ -38,11 +38,9 @@ const getPrices = async () => {
 //lambda handler
 
 module.exports.testSub = async (event, context) => {
-    console.log(process.env.SLACK_BOT_TOKEN, process.env.APP_TOKEN, process.env.SLACK_SIGNING_SECRET)
+    
     const test = await getPrices()
     const url = process.env.SLACK_URL
-    console.log(url)
-    console.log(JSON.stringify(test.eth.ethereum.usd))
     const payload = {
       "blocks": [
         {
