@@ -1,9 +1,7 @@
-
-  const getUsd = require('../app');
-  const axios = require('axios');
-  
+const axios = require('axios');
+  const getUsd = require('../app')
   jest.mock('axios');
-  
+
   it('returns bitcoin price in dollars', async () => {
     axios.get.mockResolvedValue({
       data: [
@@ -12,7 +10,9 @@
         }
       ]
     });
-  
+
     const dollar = await getUsd();
-    expect(dollar).toEqual(61865);
+
+    expect(dollar).toEqual([{"usd": 61865}]);
+
   });

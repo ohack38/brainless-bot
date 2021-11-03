@@ -36,11 +36,16 @@ const getPrices = async () => {
   }
 }
 async function getUsd() {
-  const response = await axios.get(createUrl('bitcoin'));
-  return response.data.usd;
+  try {
+    const response = await axios.get(createUrl('bitcoin'));
+  return response.data;
+  } catch (error) {
+    console.error(error);
+  }
 }
-
 module.exports = getUsd;
+
+
 
 
 //lambda handler
