@@ -1,6 +1,7 @@
 const { App, AwsLambdaReceiver } = require("@slack/bolt");
 
 const axios = require('axios');
+
 // Initializes your app with your bot token and signing secret
 const awsLambdaReceiver = new AwsLambdaReceiver({
     signingSecret: process.env.SLACK_SIGNING_SECRET,
