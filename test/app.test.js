@@ -4,7 +4,7 @@
   
   jest.mock('axios');
   
-  it('returns the title of the first album', async () => {
+  it('returns bitcoin price in dollars', async () => {
     axios.get.mockResolvedValue({
       data: [
         {
