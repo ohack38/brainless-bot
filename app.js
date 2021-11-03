@@ -37,7 +37,7 @@ const getPrices = async () => {
 async function getUsd() {
   try {
     const response = await axios.get(createUrl('bitcoin'));
-  return response.data.usd;
+  return response.data;
   } catch (error) {
     console.error(error);
   }
