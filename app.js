@@ -1,5 +1,6 @@
 const { App, AwsLambdaReceiver } = require("@slack/bolt");
 
+const axios = require('axios');
 // Initializes your app with your bot token and signing secret
 const awsLambdaReceiver = new AwsLambdaReceiver({
     signingSecret: process.env.SLACK_SIGNING_SECRET,
@@ -10,54 +11,92 @@ const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   processBeforeResponse: true,
   //socketMode:true,
-  appToken: process.env.APP_TOKEN
-});
-
-
-// Listens to incoming messages that contain "hello"
-app.message('hello', async ({ message, say }) => {
-    // say() sends a message to the channel where the event was triggered
-    await say({
-      blocks: [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": `Hey there <@${message.user}>!`
-          },
-          "accessory": {
-            "type": "button",
-            "text": {
-              "type": "plain_text",
-              "text": "Click Me"
-            },
-            "action_id": "button_click"
-          }
-        }
-      ],
-      text: `Hey there <@${message.user}>!`
-    });
-  });
-  
-// Listens for an action from a button click
-app.action('button_click', async ({ body, ack, say }) => {
-  await say(`<@${body.user.id}> clicked the button`);
-  
-  // Acknowledge the action after say() to exit the Lambda process
-  await ack();
-});
+  appToken: process.env.APP_TOKEN,
  
-  
-  // Handle the Lambda function event
-module.exports.handler = async (event, context, callback) => {
-    const handler = await awsLambdaReceiver.start();
-    return handler(event, context, callback);
+});
+
+
+const createUrl = (symbol) => {
+  const url = `https://api.coingecko.com/api/v3/simple/price?ids=${symbol}&vs_currencies=usd`
+  return url
+}
+const getPrices = async () => {
+  const ethUrl = createUrl('ethereum')
+  const btcUrl = createUrl('bitcoin')
+  try {
+    const ethRes = await axios.get(ethUrl)
+    const btcRes = await axios.get(btcUrl)
+
+    const eth = ethRes.data
+    const btc = btcRes.data
+    return { eth, btc }
+  } catch (error) {
+    console.error(error);
+  }
 }
 
-module.exports.testSub = async (event, context, callback) => {
-    console.log('consuming testSub');
-    console.log('event received:', JSON.stringify(event));
-    console.log('context received:', context);
+//lambda handler
+
+module.exports.testSub = async (event, context) => {
+    console.log(process.env.SLACK_BOT_TOKEN, process.env.APP_TOKEN, process.env.SLACK_SIGNING_SECRET)
+    const test = await getPrices()
+    const url = process.env.SLACK_URL
+    console.log(url)
+    console.log(JSON.stringify(test.eth.ethereum.usd))
+    const payload = {
+      "blocks": [
+        {
+          "type": "divider"
+        },
+        {
+          "type": "header",
+          "text": {
+            "type": "plain_text",
+            "text": "Crypto Insight",
+            "emoji": true
+          }
+        },
+        {
+          "type": "section",
+          "fields": [
+            {
+              "type": "mrkdwn",
+              "text": ":btc: *BTC*"
+            },
+            {
+              "type": "plain_text",
+              "text": JSON.stringify(test.btc.bitcoin.usd),
+              "emoji": true
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "fields": [
+            {
+              "type": "mrkdwn",
+              "text": ":eth: *ETH*"
+            },
+            {
+              "type": "plain_text",
+              "text": JSON.stringify(test.eth.ethereum.usd),
+              "emoji": true
+            }
+          ]
+        }
+        
+      ]
+    }
+    try {
+      await axios.post(url, payload ,{
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      })
+    } catch (err) {
+      console.error(err)
+    }
+  
     return {
         statusCode: 200,
         body: JSON.stringify(
@@ -67,4 +106,4 @@ module.exports.testSub = async (event, context, callback) => {
       };
 }
 //RELEASE TEST
-//https://hooks.slack.com/services/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
+//
