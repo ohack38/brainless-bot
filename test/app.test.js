@@ -15,4 +15,5 @@
   
     const dollar = await getUsd();
     expect(dollar).toEqual(61865);
+    
   });
